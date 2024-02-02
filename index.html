@@ -1,0 +1,111 @@
+
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <meta http-equiv="X-UA-Compatible" content="ie=edge">
+        <title>Órbita - Nuno Loureiro</title>
+
+        <script src="js/hydraSynth.js"></script>
+        <script src="js/p5.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/0.7.3/addons/p5.dom.min.js"></script>
+        <script src="js/sketch.js"></script>
+        <link rel="stylesheet" type="text/css" href="css/style.css" media="screen" />
+    </head>
+
+
+    <body>
+
+      <!-- p5js & hydra code -->
+      <div id="c1"></div> <br>
+      <div id="c2"></div>
+
+
+        <div id="buttonClass">
+          <div id="center">
+              <button id="start">l u .  t u a  &#60; u a  s u a</button>
+          </div>
+        </div>
+
+        <!-- <button id="start"> Start </button> -->
+        <div id="loading"> Loading ... </div>
+        <script src="js/webpd-runtime.js"></script>
+        <script>
+            // SUMMARY
+            // 1. WEB PAGE INITIALIZATION
+            // 2. SENDING MESSAGES FROM JAVASCRIPT TO THE PATCH
+            // 3. SENDING MESSAGES FROM THE PATCH TO JAVASCRIPT (coming soon ...)
+
+
+            // ------------- 1. WEB PAGE INITIALIZATION
+            const loadingDiv = document.querySelector('#loading')
+            const startButton = document.querySelector('#start')
+            const audioContext = new AudioContext()
+
+            let patch = null
+            let stream = null
+            let webpdNode = null
+
+            const initApp = async () => {
+                // Register the worklet
+                await WebPdRuntime.initialize(audioContext)
+
+                // Fetch the patch code
+                response = await fetch('js/main.wasm')
+                patch = await response.arrayBuffer()
+
+                // Comment this if you don't need audio input
+                //stream = await navigator.mediaDevices.getUserMedia({ audio: true })
+
+                // Hide loading and show start button
+                loadingDiv.style.display = 'none'
+                startButton.style.display = 'block'
+            }
+
+            const startApp = async () => {
+                // AudioContext needs to be resumed on click to protects users
+                // from being spammed with autoplay.
+                // See : https://github.com/WebAudio/web-audio-api/issues/345
+                if (audioContext.state === 'suspended') {
+                    audioContext.resume()
+                }
+
+                // Setup web audio graph
+                webpdNode = await WebPdRuntime.run(
+                    audioContext,
+                    patch,
+                    WebPdRuntime.defaultSettingsForRun('js/main.wasm'),
+                )
+                webpdNode.connect(audioContext.destination)
+
+                // Comment this if you don't need audio input
+              //  const sourceNode = audioContext.createMediaStreamSource(stream)
+                //sourceNode.connect(webpdNode)
+
+                // Hide the start button
+                startButton.style.display = 'none'
+            }
+
+            startButton.onclick = startApp
+
+            initApp().
+                then(() => {
+                    console.log('App initialized')
+                })
+
+            const sendMsgToWebPd = (nodeId, portletId, message) => {
+                webpdNode.port.postMessage({
+                    type: 'io:messageReceiver',
+                    payload: {
+                        nodeId,
+                        portletId,
+                        message,
+                    },
+                })
+            }
+
+
+        </script>
+    </body>
+</html>

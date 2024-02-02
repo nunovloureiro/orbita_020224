@@ -1,0 +1,169 @@
+@font-face{
+    font-family: 'Open Sans';
+    src: url('./fonts/OpenSans-Bold.ttf');
+}
+
+@font-face{
+    font-family: 'Obitron';
+    src:url('../fonts/Orbitron-VariableFont_wght.ttf')
+}
+
+html, body, div, span, applet, object, iframe,
+h1, h2, h3, h4, h5, h6, p, blockquote, pre,
+a, abbr, acronym, address, big, cite, code,
+del, dfn, em, img, ins, kbd, q, s, samp,
+small, strike, strong, sub, sup, tt, var,
+b, u, i, center,
+dl, dt, dd, ol, ul, li,
+fieldset, form, label, legend,
+table, caption, tbody, tfoot, thead, tr, th, td,
+article, aside, canvas, details, embed,
+figure, figcaption, footer, header, hgroup,
+menu, nav, output, ruby, section, summary,
+time, mark, audio, video {
+	margin: 0;
+	padding: 0;
+	border: 0;
+	font-size: 100%;
+	font: inherit;
+	vertical-align: baseline;
+}
+/* HTML5 display-role reset for older browsers */
+article, aside, details, figcaption, figure,
+footer, header, hgroup, menu, nav, section {
+	display: block;
+}
+body {
+	line-height: 1;
+}
+ol, ul {
+	list-style: none;
+}
+blockquote, q {
+	quotes: none;
+}
+blockquote:before, blockquote:after,
+q:before, q:after {
+	content: '';
+	content: none;
+}
+table {
+	border-collapse: collapse;
+	border-spacing: 0;
+}
+
+  /* END OF RESET */
+  /* END OF RESET */
+  /* END OF RESET */
+  /* END OF RESET */
+  /* END OF RESET */
+
+  * { margin:0; padding:0; } /* to remove the top and left whitespace */
+
+  html, body { width:100%; height:100%; background-color: black; } /* just to be sure these are full screen*/
+
+  canvas { display:block; } /* To remove the scrollbars */
+
+
+
+/* p5js & hydra - #c1 / #c2 */
+  #c1 {
+    display: block;
+    position: absolute;
+    top:0;
+    margin: 0;
+    padding: 0;
+  }
+
+  #c2 {
+    display: block;
+    position: absolute;
+    top:0;
+    width: 100%;
+    height: 100%;
+    margin: 0;
+    padding: 0;
+    z-index:1;
+  }
+
+
+  h1{
+      position: absolute;
+      top: 40%;
+      width: 100%;
+      font-size: 5.96vw;
+      font-weight: 900;
+      text-align: center;
+      color: #910000;
+      mix-blend-mode: overlay;
+      overflow: hidden;
+      z-index: 2;
+
+  }
+
+
+  a:link{
+    color: inherit;
+    background-color: inherit;
+    text-decoration: none;
+    z-index: 2;
+  }
+
+  #buttonClass {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    background-color: transparent;
+    mix-blend-mode: normal;
+    z-index: 2;
+  }
+
+  #center {
+    margin: 0;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    -ms-transform: translate(-50%,-50%);
+    transform: translate(-50%, -50%);
+    mix-blend-mode: inherit;
+  }
+
+  #start {
+      display: none;
+      position: relative;
+      font-size: 5.9vw;
+      font-weight: 900;
+      text-align: center;
+      color: #910000;
+      border: none;
+      background-color: transparent;
+      mix-blend-mode: normal;
+      overflow: hidden;
+      z-index: 2;
+      text-decoration: none;
+  }
+
+  #start:hover {
+    color: #0e085c;
+  }
+
+  #loading {
+      width: 100%;
+      height: 100%;
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      /* transform: translateY(-50%); */
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      z-index: 2;
+  }
+
+  @media only screen and (max-width:700px) {
+
+    #start {
+      font-size: 4.9vw;
+    }
+
+  }
