@@ -345,7 +345,7 @@ var sketch1 = function(p){
         // p.pop();
 
         p.push();
-          p.strokeWeight(Math.random());
+          p.strokeWeight(0.6);//p.strokeWeight(Math.random());
           p.stroke(Math.random()*180, Math.random()*90);
           // p.fill(Math.random()*100, Math.random()*120);
           // p.rotateX(p.PI);
