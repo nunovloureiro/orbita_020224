@@ -273,7 +273,10 @@ var sketch1 = function(p){
       p.background(0);
       p.toImage(c);
       p.texture(p.tex);
-      p.sphere(p.windowWidth, p.windowHeight);
+      p.push();
+        p.noStroke();
+        p.sphere(p.windowWidth, 24, 24);
+      p.pop();
       firstPerson(p.cam, p.move);
       p.drawScene();
 
