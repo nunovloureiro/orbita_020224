@@ -94,19 +94,28 @@ var sketch1 = function(p){
   }
 
   ///HYDRA BACKGROUND CANVAS
-  p.hc = document.createElement('canvas')
-  p.hc.width = 300;
-  p.hc.height = 300;
-  p.pg;
+  const c = document.createElement('canvas');
+  const hydra = new Hydra({detectAudio: false, canvas: c})
+  hydra.setResolution(720,480)
+  ///HYDRA BACKGROUND CODE
+  fps = 30
+  function r(min = 0.0721, max = 10) {
+    return Math.random() * (max - min) + min;
+  }
 
-  let hydra = new Hydra({ detectAudio: false, canvas: p.hc });
+  // noise(r(0.0005,1),0.2).mult(solid(0.6,0,0.4)).out()
+  // noise(2,0.2).mult(solid(0.6,0,0.4)).out()
 
-  fps = 30;
   x = () => (-mouse.x/width)+.5
   y = () => (-mouse.y/height)+.5
 
+  // ()=>1+x()*2
+
   a = function(){return 0.8 * Math.sin(time*0.1)};
   b = function(){return 0.04 * Math.sin(time*0.01)};
+
+  // timeV1 = x * y - b;
+  // timeV2 = y / x + b;
 
   noise(()=> 2 + 1 * x() / y() * (Math.sin(time*0.01)+0.2),0.2).mult(solid(a,b,() => 0.2 + 0.5 * y() / x() * (Math.cos(time*0.015)+0.2))).modulate(noise(()=> 0.1*x()*y()), 0.1).out()
 
@@ -135,6 +144,7 @@ var sketch1 = function(p){
   p.cols;
   p.rows;
 
+  p.LuaOnusUV;
   p.edificio;
 
   p.names;
@@ -156,7 +166,6 @@ var sketch1 = function(p){
   p.setup = function(){
     p.frameRate(p.targetFrameRate);
     p.createCanvas(p.windowWidth,p.windowHeight, p.WEBGL);
-    p.pg = p.createGraphics(p.hc.width, p.hc.height);
 
     if(p.windowWidth / p.windowHeight < 1){
       p.scaler = 0.3;
@@ -170,7 +179,9 @@ var sketch1 = function(p){
     p.vhs = p.createGraphics(p.windowWidth, p.windowHeight);
     p.textCanvas = p.createGraphics(p.windowWidth, p.windowHeight, p.WEBGL);
     p.cam = p.createCamera();
+
     p.background(0);
+
     p.setupMarkovText();
     p.showText();
     p.grid();
@@ -266,12 +277,12 @@ var sketch1 = function(p){
   }
 
   p.draw = function() {
-      p.pg.drawingContext.drawImage(p.hc, 0, 0, p.pg.width, p.pg.height);
 
       // let fps = p.frameRate();
       // console.log(fps);
       p.background(0);
-      p.texture(p.pg);
+      p.toImage(c);
+      // p.texture(p.tex);
       p.push();
         p.noStroke();
         p.sphere(p.windowWidth, 24, 24);
