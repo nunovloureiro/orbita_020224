@@ -148,7 +148,7 @@ var sketch1 = function(p){
   p.preload = function() {
     // p.LuaOnusUV = p.loadImage('js/capa_digital.jpg');
     p.edificio = p.loadModel('js/Edificios.obj');
-    p.font = p.loadFont('assets/SpaceGrotesk.ttf');
+    p.font = p.loadFont('./assets/SpaceGrotesk.ttf');
     p.names = p.loadStrings('js/recipes.txt');
   }
 
@@ -256,6 +256,8 @@ var sketch1 = function(p){
           p.textCanvas.textSize(p.windowWidth/20);
           p.textCanvas.textStyle(p.BOLD);
           p.textCanvas.textAlign(p.CENTER, p.CENTER);
+          p.textCanvas.fill(Math.random()*255, Math.random()*255, Math.random()*255);
+          p.textCanvas.blendMode(p.SCREEN);
           p.textCanvas.translate(Math.random()*p.windowWidth/4,0, Math.random()*p.windowHeight/9);
 
           if (typeof chosenWord == 'string') {
