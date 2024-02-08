@@ -34,6 +34,10 @@
 
         <!-- WELCOME SCREEN TOGGLE-->
         <script>
+        $(document).ready(function(){
+          $("#start").prop("disabled", true);
+          setTimeout(function(){$("#start").prop("disabled", false)}, 5000);
+          })
         $("#start").click(function(){
           // $("#c3").hide();
           $("#c3").fadeOut(1500);
