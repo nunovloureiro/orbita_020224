@@ -417,35 +417,35 @@ var sketch2 = function(p){
     p.cols = p.windowWidth/p.scl;
     p.rows = p.windowHeight/p.scl;
     p.vhsGrid();
-    p.showTitle();
-  }
-
-  p.startSketch = function(){
-    p.button = document.getElementById("start").innerText;
-    console.log(p.button);
-  }
-
-
-  p.showTitle = function() {
-    p.fill(p.titleColor);
-    p.stroke(10);
-    p.textAlign(p.CENTER);
-    p.textSize(70);
-    p.text('helloWorld', 300,300);
-  }
-
-  p.titleToggle = function() {
-    p.buttonValue = document.getElementById("start").innerText;
-    // p.titleColor = 120;
-    console.log('Button value:', p.buttonValue);
     // p.showTitle();
   }
-
-  p.startPause = function() {
-
-    p.fill(p.random(255), p.random(255), p.random(255));
-    p.text('helloWorld', 300,300);
-  }
+  //
+  // p.startSketch = function(){
+  //   p.button = document.getElementById("start").innerText;
+  //   console.log(p.button);
+  // }
+  //
+  //
+  // p.showTitle = function() {
+  //   p.fill(p.titleColor);
+  //   p.stroke(10);
+  //   p.textAlign(p.CENTER);
+  //   p.textSize(70);
+  //   p.text('helloWorld', 300,300);
+  // }
+  //
+  // p.titleToggle = function() {
+  //   p.buttonValue = document.getElementById("start").innerText;
+  //   // p.titleColor = 120;
+  //   console.log('Button value:', p.buttonValue);
+  //   // p.showTitle();
+  // }
+  //
+  // p.startPause = function() {
+  //
+  //   p.fill(p.random(255), p.random(255), p.random(255));
+  //   p.text('helloWorld', 300,300);
+  // }
 
 
   p.vhsGrid = function() {
@@ -461,9 +461,99 @@ var sketch2 = function(p){
         }
     }
 
+  p.windowResized = function(){
+            p.resizeCanvas(p.windowWidth, p.windowHeight);
+    }
+
 }
 
-p5.disableFriendlyErrors = true;
+///WELCOME SCREEN
+var sketch3 = function(p){
+
+  p.Xaxis = p.windowWidth;
+  p.Yaxis = p.windowHeight;
+
+  p.title =
+  ["l  -  a   t  u  /   r  u  a   -  u  a",
+   "l  u  .   t  u  a   <  u  a   s  u  a",
+   "z  u  a   z  _  a   t  .  a   l  u  ^",
+   "'  u  a   l  u  a   z  u  \   .  u  a",
+   "s  u  -   r  >  a   z  u  a   l  u  a",
+   "r  u  a   |  u  a   r  u  _   l  u  a",
+   "<  u  a   z  u  a   t  ^  a   l  u  a",
+   "t  u  a   t  u  a   r  u  a   l  u  a"];
+
+  p.titleIndex = 0;
+  p.textCanvas;
+  p.preload = function(){
+    p.font = p.loadFont('./assets/SpaceGrotesk.ttf');
+  }
+
+  p.setup = function(){
+    p.createCanvas(p.Xaxis,p.Yaxis);
+    p.textCanvas = p.createGraphics(p.Xaxis, p.Yaxis);
+    p.frameRate(14);
+    p.textFont = p.font;
+    p.textCanvas.textAlign(p.CENTER);
+    p.textCanvas.fill(255);
+    // p.textFont('Courier New');
+
+  }
+
+  p.draw = function(){
+    p.clear();
+    p.rectDraw();
+    p.textDraw();
+    //INFO TEXT
+    p.textCanvas.textAlign(p.CENTER,p.CENTER);
+    p.textCanvas.textStyle(p.NORMAL);
+    p.textCanvas.textSize(p.int(p.Xaxis/70));
+    p.textCanvas.text("infinitely deformed and transformed cuts of lua onus. eyes with mouse/trackpad - w+a+s+d makes it move.\ncomputer use is recommended. mobile cpu is not good enough. select a pixel to make it sound. esc key to shut it up.", p.Xaxis/2, p.Yaxis/2.8);
+// p.Yaxis/3.3
+    //INFO TEXT 2
+    p.textCanvas.textAlign(p.CENTER,p.CENTER);
+    p.textCanvas.textStyle(p.NORMAL);
+    p.textCanvas.textSize(p.int(p.Xaxis/70));
+    p.textCanvas.text("piece created by nuno loureiro for gnration's órbita program [órbita #23]. huge thank yous to the authors of the open\nsource tools that were necessary to its development (webpd: sébastien piquemal / hydra: olivia jack / pd / p5js) as well \nas the respective discord communities, daniel shiffman and gnration's luís fernandes and ilídio marques for the invite.", p.Xaxis/2, p.Yaxis/1.53);
+// p.Yaxis/1.4
+    // p.Xaxis/7.7
+
+    p.image(p.textCanvas, 0, 0);
+  }
+  p.rectDraw = function(){
+    p.push();
+      p.stroke(240,240,240);
+      p.strokeWeight(5);
+      p.rectMode(p.CENTER);
+      p.fill(0,180);
+      p.rect(p.Xaxis/2,p.Yaxis/2, p.Xaxis-p.Xaxis/6, p.Yaxis-p.Yaxis/3.5);
+    p.pop();
+  }
+
+  p.textDraw = function(){
+
+      p.textCanvas.clear();
+
+      //TITLE CYCLE
+      p.push();
+        p.textCanvas.textAlign(p.CENTER,p.CENTER);
+        p.textCanvas.textSize(p.int(p.Xaxis/18));
+        p.textCanvas.textStyle(p.BOLD);
+        p.titleIndex +=1;
+        let i = p.titleIndex%8;
+        p.textCanvas.text(p.title[i], p.Xaxis/2, p.Yaxis/2);
+      p.pop();
+  }
+
+  p.windowResized = function(){
+          p.resizeCanvas(p.windowWidth, p.windowHeight);
+          p.Xaxis = p.windowWidth;
+          p.Yaxis = p.windowHeight;
+  }
+}
+
+p5.disableFriendlyErrors = false;
 
 var myp5_1 = new p5(sketch1, 'c1');
 var myp5_2 = new p5(sketch2, 'c2');
+var myp5_3 = new p5(sketch3, 'c3');
