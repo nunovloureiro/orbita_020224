@@ -12,86 +12,94 @@ var sketch1 = function(p){
 
 
     cam.firstPersonState = cam.firstPersonState || {
-      azimuth: -Math.atan2(cam.eyeZ - cam.centerZ, cam.eyeX - cam.centerX),
-      zenith: -Math.atan2(cam.eyeY - cam.centerY, p.dist(cam.eyeX, cam.eyeZ, cam.centerX, cam.centerZ)),
-      lookAtDist: p.dist(cam.eyeX, cam.eyeY, cam.eyeZ, cam.centerX, cam.centerY, cam.centerZ),
-      mousePrevX: mouseX,
-      mousePrevY: mouseY,
-      directionChangeTime: millis,
-      directionChangeInterval: 60000,
-      transitionDuration: 2000,
-      transitionStartTime: 0,
-      transitioning: false,
-    };
+    azimuth: -Math.atan2(cam.eyeZ - cam.centerZ, cam.eyeX - cam.centerX),
+    zenith: -Math.atan2(cam.eyeY - cam.centerY, p.dist(cam.eyeX, cam.eyeZ, cam.centerX, cam.centerZ)),
+    lookAtDist: p.dist(cam.eyeX, cam.eyeY, cam.eyeZ, cam.centerX, cam.centerY, cam.centerZ),
+    mousePrevX: mouseX,
+    mousePrevY: mouseY,
+    directionChangeTime: millis,
+    directionChangeInterval: 60000,
+    transitionDuration: 2000,
+    transitionStartTime: 0,
+    transitioning: false,
+    userInput: false, // Track user input
+  };
 
-    // Check if it's time to change direction
-    if (millis - cam.firstPersonState.directionChangeTime > cam.firstPersonState.directionChangeInterval) {
-      // Start a gradual transition
-      cam.firstPersonState.transitioning = true;
-      cam.firstPersonState.transitionStartTime = millis;
-      cam.firstPersonState.startAzimuth = cam.firstPersonState.azimuth;
-      cam.firstPersonState.targetAzimuth = Math.random() * p.vPI * 2;
-      cam.firstPersonState.directionChangeTime = millis; // Update the timestamp
-    }
-
-    // Gradual transition for azimuth
-    if (cam.firstPersonState.transitioning) {
-      const elapsedTime = millis - cam.firstPersonState.transitionStartTime;
-      const t = Math.min(elapsedTime / cam.firstPersonState.transitionDuration, 1);
-      cam.firstPersonState.azimuth = p.lerp(cam.firstPersonState.startAzimuth, cam.firstPersonState.targetAzimuth, t);
-
-      // Check if the transition is complete
-      if (t === 1) {
-        cam.firstPersonState.transitioning = false;
-      }
-    }
-
-    // Look around controls
-    cam.firstPersonState.azimuth -= (mouseX - cam.firstPersonState.mousePrevX) / 100;
-    if (abs(cam.firstPersonState.zenith + (mouseY - cam.firstPersonState.mousePrevY) / 100) < p.vPI / 2) {
-      cam.firstPersonState.zenith += (mouseY - cam.firstPersonState.mousePrevY) / 100;
-    }
-
-    // Movement controls
-    let moveSpeed = 1;
-    cam.eyeX -= moveSpeed * cos(cam.firstPersonState.azimuth);
-    cam.eyeZ += moveSpeed * sin(cam.firstPersonState.azimuth);
-
-    if (cam.eyeX > p.windowWidth * 2 || cam.eyeX < p.windowWidth * -2 || cam.eyeZ > p.windowWidth * 2 || cam.eyeZ < p.windowWidth * -2) {
-      moveSpeed = -1;
-    }
-
-    if (p.keyIsPressed && (p.keyCode == 87 || p.keyIsDown(p.UP_ARROW))) {
-      cam.eyeX -= 2 * cos(cam.firstPersonState.azimuth);
-      cam.eyeZ += 2 * sin(cam.firstPersonState.azimuth);
-    }
-    if (p.keyIsPressed && (p.keyCode == 83 || p.keyIsDown(p.DOWN_ARROW))) {
-      cam.eyeX += 2 * cos(cam.firstPersonState.azimuth);
-      cam.eyeZ -= 2 * sin(cam.firstPersonState.azimuth);
-    }
-    if (p.keyIsPressed && (p.keyCode == 65 || p.keyIsDown(p.LEFT_ARROW))) {
-      cam.eyeX -= 2 * cos(cam.firstPersonState.azimuth + p.vPI / 2);
-      cam.eyeZ += 2 * sin(cam.firstPersonState.azimuth + p.vPI / 2);
-    }
-    if (p.keyIsPressed && (p.keyCode == 68 || p.keyIsDown(p.RIGHT_ARROW))) {
-      cam.eyeX += 2 * cos(cam.firstPersonState.azimuth + p.vPI / 2);
-      cam.eyeZ -= 2 * sin(cam.firstPersonState.azimuth + p.vPI / 2);
-    }
-
-    // Update previous mouse position
-    cam.firstPersonState.mousePrevX = mouseX;
-    cam.firstPersonState.mousePrevY = mouseY;
-
-    // Update the look-at point
-    cam.centerX = cam.eyeX - cam.firstPersonState.lookAtDist * cos(cam.firstPersonState.zenith) * cos(cam.firstPersonState.azimuth);
-    cam.centerY = cam.eyeY + cam.firstPersonState.lookAtDist * sin(cam.firstPersonState.zenith);
-    cam.centerZ = cam.eyeZ + cam.firstPersonState.lookAtDist * cos(cam.firstPersonState.zenith) * sin(cam.firstPersonState.azimuth);
-
-    // Call the built-in p5 function 'camera' to position and orient the camera
-    p.camera(cam.eyeX, cam.eyeY, cam.eyeZ,  // position
-      cam.centerX, cam.centerY, cam.centerZ,  // look-at
-      0, 1, 0);  // up vector
+  // Check for user input
+  if (p.keyIsPressed || mouseX !== cam.firstPersonState.mousePrevX || mouseY !== cam.firstPersonState.mousePrevY) {
+    cam.firstPersonState.userInput = true;
+  } else {
+    cam.firstPersonState.userInput = false;
   }
+
+  // Check if it's time to change direction and there's no user input
+  if (!cam.firstPersonState.userInput && millis - cam.firstPersonState.directionChangeTime > cam.firstPersonState.directionChangeInterval) {
+    // Start a gradual transition
+    cam.firstPersonState.transitioning = true;
+    cam.firstPersonState.transitionStartTime = millis;
+    cam.firstPersonState.startAzimuth = cam.firstPersonState.azimuth;
+    cam.firstPersonState.targetAzimuth = Math.random() * p.vPI * 2;
+    cam.firstPersonState.directionChangeTime = millis; // Update the timestamp
+  }
+
+  // Gradual transition for azimuth
+  if (cam.firstPersonState.transitioning) {
+    const elapsedTime = millis - cam.firstPersonState.transitionStartTime;
+    const t = Math.min(elapsedTime / cam.firstPersonState.transitionDuration, 1);
+    cam.firstPersonState.azimuth = p.lerp(cam.firstPersonState.startAzimuth, cam.firstPersonState.targetAzimuth, t);
+
+    // Check if the transition is complete
+    if (t === 1) {
+      cam.firstPersonState.transitioning = false;
+    }
+  }
+
+  // Look around controls
+  cam.firstPersonState.azimuth -= (mouseX - cam.firstPersonState.mousePrevX) / 100;
+  if (abs(cam.firstPersonState.zenith + (mouseY - cam.firstPersonState.mousePrevY) / 100) < p.vPI / 2) {
+    cam.firstPersonState.zenith += (mouseY - cam.firstPersonState.mousePrevY) / 100;
+  }
+
+  // Movement controls
+  let moveSpeed = 1;
+  cam.eyeX -= moveSpeed * cos(cam.firstPersonState.azimuth);
+  cam.eyeZ += moveSpeed * sin(cam.firstPersonState.azimuth);
+
+  if (cam.eyeX > p.windowWidth * 2 || cam.eyeX < p.windowWidth * -2 || cam.eyeZ > p.windowWidth * 2 || cam.eyeZ < p.windowWidth * -2) {
+    moveSpeed = -1;
+  }
+
+  if (p.keyIsPressed && (p.keyCode == 87 || p.keyIsDown(p.UP_ARROW))) {
+    cam.eyeX -= 2 * cos(cam.firstPersonState.azimuth);
+    cam.eyeZ += 2 * sin(cam.firstPersonState.azimuth);
+  }
+  if (p.keyIsPressed && (p.keyCode == 83 || p.keyIsDown(p.DOWN_ARROW))) {
+    cam.eyeX += 2 * cos(cam.firstPersonState.azimuth);
+    cam.eyeZ -= 2 * sin(cam.firstPersonState.azimuth);
+  }
+  if (p.keyIsPressed && (p.keyCode == 65 || p.keyIsDown(p.LEFT_ARROW))) {
+    cam.eyeX -= 2 * cos(cam.firstPersonState.azimuth + p.vPI / 2);
+    cam.eyeZ += 2 * sin(cam.firstPersonState.azimuth + p.vPI / 2);
+  }
+  if (p.keyIsPressed && (p.keyCode == 68 || p.keyIsDown(p.RIGHT_ARROW))) {
+    cam.eyeX += 2 * cos(cam.firstPersonState.azimuth + p.vPI / 2);
+    cam.eyeZ -= 2 * sin(cam.firstPersonState.azimuth + p.vPI / 2);
+  }
+
+  // Update previous mouse position
+  cam.firstPersonState.mousePrevX = mouseX;
+  cam.firstPersonState.mousePrevY = mouseY;
+
+  // Update the look-at point
+  cam.centerX = cam.eyeX - cam.firstPersonState.lookAtDist * cos(cam.firstPersonState.zenith) * cos(cam.firstPersonState.azimuth);
+  cam.centerY = cam.eyeY + cam.firstPersonState.lookAtDist * sin(cam.firstPersonState.zenith);
+  cam.centerZ = cam.eyeZ + cam.firstPersonState.lookAtDist * cos(cam.firstPersonState.zenith) * sin(cam.firstPersonState.azimuth);
+
+  // Call the built-in p5 function 'camera' to position and orient the camera
+  p.camera(cam.eyeX, cam.eyeY, cam.eyeZ,  // position
+    cam.centerX, cam.centerY, cam.centerZ,  // look-at
+    0, 1, 0);  // up vector
+  };
 
   ///HYDRA BACKGROUND CANVAS
   p.hc = document.createElement('canvas')
@@ -102,17 +110,20 @@ var sketch1 = function(p){
   let hydra = new Hydra({ detectAudio: false, canvas: p.hc });
 
   fps = 30;
-  x = () => (-mouse.x/width)+.5
-  y = () => (-mouse.y/height)+.5
+  x = () => (-mouse.x/width+.5)*0.5;
+  y = () => (-mouse.y/height+.5)*0.5;
 
   a = function(){return 0.8 * Math.sin(time*0.1)};
   b = function(){return 0.04 * Math.sin(time*0.01)};
 
-  noise(()=> 2 + 1 * x() / y() * (Math.sin(time*0.01)+0.2),0.2).mult(solid(a,b,() => 0.2 + 0.5 * y() / x() * (Math.cos(time*0.015)+0.2))).modulate(noise(()=> 0.1*x()*y()), 0.1).out()
+  noise(()=> 0.7 + 1 + x() + y() * (Math.sin(time*0.01)+0.2),0.3).mult(solid(a,b,() => 0.2 + 0.5 * y()/1.5 / x()/1.5 * (Math.cos(time*0.015)+0.2))).modulate(noise(()=> 0.1*x()*x()*y()), 0.1).saturate(1.5).contrast(2.5).out()
+
+    // noise(()=> 0.2 + 1 * x() / y() * (Math.sin(time*0.01)+0.2),0.07).mult(solid(a,b,() => 0.2 + 0.5 * y()/1.5 / x()/1.5 * (Math.cos(time*0.015)+0.2))).modulate(noise(()=> 0.01*x()*x()*y()), 0.1).saturate(1.5).contrast(2.5).out()
 
 
   ////P5JS INIT
 
+  p.isPhone = 0;
   p.targetFrameRate = 40;
 
   p.move = 2;
@@ -159,7 +170,8 @@ var sketch1 = function(p){
     p.pg = p.createGraphics(p.hc.width, p.hc.height);
 
     if(p.windowWidth / p.windowHeight < 1){
-      p.scaler = 0.3;
+      p.isPhone = 1;
+      p.scaler = 0.15;
     } else {p.scaler = 1;
       }
 
@@ -276,9 +288,11 @@ var sketch1 = function(p){
       p.texture(p.pg);
       p.push();
         p.noStroke();
+        p.scale(1);
         p.sphere(p.windowWidth, 24, 24);
       p.pop();
       firstPerson(p.cam, p.move);
+      p.scale(p.scaler);
       p.drawScene();
 
       //temepo aleatório para apagar palavra antiga. verificar que funciona?
@@ -354,7 +368,6 @@ var sketch1 = function(p){
           // p.fill(Math.random()*100, Math.random()*120);
           // p.rotateX(p.PI);
           // p.translate(0,-500,0);
-          p.scale(p.scaler);
           p.model(p.edificio);
         p.pop();
 
@@ -474,6 +487,8 @@ var sketch3 = function(p){
 
   p.Xaxis = p.windowWidth;
   p.Yaxis = p.windowHeight;
+  p.value = 0;
+  p.isPhone = 0;
 
   p.title =
   ["l  -  a   t  u  /   r  u  a   -  u  a",
@@ -498,7 +513,50 @@ var sketch3 = function(p){
     p.textFont = p.font;
     p.textCanvas.textAlign(p.CENTER);
     p.textCanvas.fill(255);
+    console.log("width: ",p.Xaxis);
+    console.log("height: ",p.Yaxis);
+    let conta = p.Xaxis/p.Yaxis;
+    console.log("conta: ", conta);
+
+    if(p.Xaxis / p.Yaxis < 1){
+      p.isPhone = 1;
+    } else {
+      p.isPhone = 0;
+    }
     // p.textFont('Courier New');
+    console.log("isPhone: ", p.isPhone);
+  }
+
+  //INFO TEXT
+  p.infoText = function() {
+    p.textCanvas.textAlign(p.CENTER,p.CENTER);
+    p.textCanvas.textStyle(p.NORMAL);
+    p.textCanvas.textSize(p.int(p.Xaxis/70));
+    p.textCanvas.text("infinitely deformed and transformed cuts of lua onus. eyes with mouse/trackpad - w+a+s+d makes it move.\ncomputer use is recommended. mobile cpu is not good enough. select a pixel to make it sound. esc key to shut it up.", p.Xaxis/2, p.Yaxis/2.8);
+    // p.Yaxis/3.3
+    //INFO TEXT 2
+    p.textCanvas.textAlign(p.CENTER,p.CENTER);
+    p.textCanvas.textStyle(p.NORMAL);
+    p.textCanvas.textSize(p.int(p.Xaxis/70));
+    p.textCanvas.text("piece created by nuno loureiro for gnration's órbita program [órbita #23]. huge thank yous to the authors of the open\nsource tools that were necessary to its development (webpd: sébastien piquemal / hydra: olivia jack / pd / p5js) as well \nas the respective discord communities, daniel shiffman and gnration's luís fernandes and ilídio marques for the invite.", p.Xaxis/2, p.Yaxis/1.53);
+    // p.Yaxis/1.4
+    // p.Xaxis/7.7
+
+  }
+
+  p.infoTextPhone = function() {
+    p.textCanvas.textAlign(p.CENTER,p.CENTER);
+    p.textCanvas.textStyle(p.NORMAL);
+    p.textCanvas.textSize(p.int(p.Yaxis/70));
+    p.textCanvas.text("infinitely deformed and transformed cuts of lua onus.\neyes with mouse/trackpad - w+a+s+d makes it move.\ncomputer use is recommended.\nmobile cpu is not good enough.\nselect a pixel to make it sound.", p.Xaxis/2, p.Yaxis/2.8);
+    // p.Yaxis/3.3
+    //INFO TEXT 2
+    p.textCanvas.textAlign(p.CENTER,p.CENTER);
+    p.textCanvas.textStyle(p.NORMAL);
+    p.textCanvas.textSize(p.int(p.Yaxis/70));
+    p.textCanvas.text("piece created by nuno loureiro for gnration's órbita\nprogram [órbita #23]. huge thank you to the authors of the\nopen source tools that were necessary to its development\n(webpd: sébastien piquemal / hydra: olivia jack / pd / p5js)\nas well as the respective discord communities, daniel shiffman\nand gnration's luís fernandes and ilídio marques for the invite.", p.Xaxis/2, p.Yaxis/1.53);
+    // p.Yaxis/1.4
+    // p.Xaxis/7.7
 
   }
 
@@ -507,18 +565,15 @@ var sketch3 = function(p){
     p.rectDraw();
     p.textDraw();
     //INFO TEXT
-    p.textCanvas.textAlign(p.CENTER,p.CENTER);
-    p.textCanvas.textStyle(p.NORMAL);
-    p.textCanvas.textSize(p.int(p.Xaxis/70));
-    p.textCanvas.text("infinitely deformed and transformed cuts of lua onus. eyes with mouse/trackpad - w+a+s+d makes it move.\ncomputer use is recommended. mobile cpu is not good enough. select a pixel to make it sound. esc key to shut it up.", p.Xaxis/2, p.Yaxis/2.8);
-// p.Yaxis/3.3
-    //INFO TEXT 2
-    p.textCanvas.textAlign(p.CENTER,p.CENTER);
-    p.textCanvas.textStyle(p.NORMAL);
-    p.textCanvas.textSize(p.int(p.Xaxis/70));
-    p.textCanvas.text("piece created by nuno loureiro for gnration's órbita program [órbita #23]. huge thank yous to the authors of the open\nsource tools that were necessary to its development (webpd: sébastien piquemal / hydra: olivia jack / pd / p5js) as well \nas the respective discord communities, daniel shiffman and gnration's luís fernandes and ilídio marques for the invite.", p.Xaxis/2, p.Yaxis/1.53);
-// p.Yaxis/1.4
-    // p.Xaxis/7.7
+
+    // console.log("isPhone: ", p.isPhone);
+
+    if (p.isPhone == 1){
+      p.infoTextPhone();
+      // console.log("isPhone");
+    } else {
+      p.infoText();
+    }
 
     p.image(p.textCanvas, 0, 0);
   }
@@ -544,8 +599,16 @@ var sketch3 = function(p){
         p.titleIndex +=1;
         let i = p.titleIndex%8;
         p.textCanvas.text(p.title[i], p.Xaxis/2, p.Yaxis/2);
+        // console.log(p.pRotationX);
       p.pop();
+
+      // p.value = map(p.rotationX, -p.PI, p.PI, 0, 255);
+      // p.fill(p.value, 100, 100);
+      // p.rectMode(p.CENTER);
+      // p.rect(25, 25, 50, 50);
+
   }
+
 
   p.windowResized = function(){
           p.resizeCanvas(p.windowWidth, p.windowHeight);
