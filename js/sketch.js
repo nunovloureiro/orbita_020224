@@ -538,7 +538,7 @@ var sketch3 = function(p){
     p.textCanvas.textAlign(p.CENTER,p.CENTER);
     p.textCanvas.textStyle(p.NORMAL);
     p.textCanvas.textSize(p.int(p.Xaxis/70));
-    p.textCanvas.text("piece created by nuno loureiro for gnration's órbita program [órbita #23]. huge thank yous to the authors of the open\nsource tools that were necessary to its development (webpd: sébastien piquemal / hydra: olivia jack / pd / p5js) as well \nas the respective discord communities, daniel shiffman and gnration's luís fernandes and ilídio marques for the invite.", p.Xaxis/2, p.Yaxis/1.53);
+    p.textCanvas.text("piece created by nuno loureiro for gnration's órbita program [órbita #23]. huge thank you to the authors of the open\nsource tools that were necessary to its development (webpd: sébastien piquemal / hydra: olivia jack / pd / p5js) as well \nas the respective discord communities, daniel shiffman and gnration's luís fernandes and ilídio marques for the invite.", p.Xaxis/2, p.Yaxis/1.53);
     // p.Yaxis/1.4
     // p.Xaxis/7.7
 
@@ -548,7 +548,7 @@ var sketch3 = function(p){
     p.textCanvas.textAlign(p.CENTER,p.CENTER);
     p.textCanvas.textStyle(p.NORMAL);
     p.textCanvas.textSize(p.int(p.Yaxis/70));
-    p.textCanvas.text("infinitely deformed and transformed cuts of lua onus.\neyes with mouse/trackpad - w+a+s+d makes it move.\ncomputer use is recommended. mobile cpu\nis not good enough. select a pixel to make it sound.", p.Xaxis/2, p.Yaxis/2.8);
+    p.textCanvas.text("infinitely deformed and transformed cuts of lua onus.\neyes with mouse/trackpad - w+a+s+d makes it move.\ncomputer use is recommended. mobile cpu is not\ngood enough. select a pixel to make it sound.", p.Xaxis/2, p.Yaxis/2.8);
     // p.Yaxis/3.3
     //INFO TEXT 2
     p.textCanvas.textAlign(p.CENTER,p.CENTER);
