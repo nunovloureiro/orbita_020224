@@ -548,7 +548,7 @@ var sketch3 = function(p){
     p.textCanvas.textAlign(p.CENTER,p.CENTER);
     p.textCanvas.textStyle(p.NORMAL);
     p.textCanvas.textSize(p.int(p.Yaxis/70));
-    p.textCanvas.text("infinitely deformed and transformed cuts of lua onus.\neyes with mouse/trackpad - w+a+s+d makes it move.\ncomputer use is recommended.\nmobile cpu is not good enough.\nselect a pixel to make it sound.", p.Xaxis/2, p.Yaxis/2.8);
+    p.textCanvas.text("infinitely deformed and transformed cuts of lua onus.\neyes with mouse/trackpad - w+a+s+d makes it move.\ncomputer use is recommended. mobile cpu\nis not good enough. select a pixel to make it sound.", p.Xaxis/2, p.Yaxis/2.8);
     // p.Yaxis/3.3
     //INFO TEXT 2
     p.textCanvas.textAlign(p.CENTER,p.CENTER);
