@@ -40,8 +40,8 @@ var sketch1 = function(p){
   cam.firstPersonState.transitionStartTime = millis;
   cam.firstPersonState.startAzimuth = cam.firstPersonState.azimuth;
 
-  // Check if cam.eyeX, cam.eyeY or cam.eyeZ is larger than (p.windowWidth + 200)
-  if (cam.eyeX > p.windowWidth + 200 || cam.eyeY > p.windowWidth + 200 || cam.eyeZ > p.windowWidth + 200) {
+  // Check if cam.eyeX or cam.eyeZ is larger than (p.windowWidth + 200)
+  if (cam.eyeX > p.windowWidth + 200 || cam.eyeZ > p.windowWidth + 200) {
     cam.firstPersonState.targetAzimuth = -Math.atan2(cam.eyeZ, cam.eyeX); // point towards (0, 0, 0)
   } else {
     cam.firstPersonState.targetAzimuth = Math.random() * p.vPI * 2;
@@ -70,30 +70,20 @@ var sketch1 = function(p){
 
   // Movement controls
   let moveSpeed = 1;
-  let moveDirectionX = cos(cam.firstPersonState.azimuth); // X component of movement direction
-  let moveDirectionZ = sin(cam.firstPersonState.azimuth); // Z component of movement direction
-
-  // Adjust moveDirectionX and moveDirectionZ based on zenith angle
-  moveDirectionX *= cos(cam.firstPersonState.zenith);
-  moveDirectionZ *= cos(cam.firstPersonState.zenith);
-
-  // Calculate the Y component of movement direction
-  let moveDirectionY = sin(cam.firstPersonState.zenith);
-
+  cam.eyeX -= moveSpeed * cos(cam.firstPersonState.azimuth);
+  cam.eyeZ += moveSpeed * sin(cam.firstPersonState.azimuth);
 
   if (cam.eyeX > p.windowWidth * 2 || cam.eyeX < p.windowWidth * -2 || cam.eyeZ > p.windowWidth * 2 || cam.eyeZ < p.windowWidth * -2) {
     moveSpeed = -1;
   }
 
   if (p.keyIsPressed && (p.keyCode == 87 || p.keyIsDown(p.UP_ARROW))) {
-    cam.eyeX += moveSpeed * moveDirectionX;
-    cam.eyeY += moveSpeed * moveDirectionY;
-    cam.eyeZ += moveSpeed * moveDirectionZ;
+    cam.eyeX -= 2 * cos(cam.firstPersonState.azimuth);
+    cam.eyeZ += 2 * sin(cam.firstPersonState.azimuth);
   }
   if (p.keyIsPressed && (p.keyCode == 83 || p.keyIsDown(p.DOWN_ARROW))) {
-    cam.eyeX -= moveSpeed * moveDirectionX;
-    cam.eyeY -= moveSpeed * moveDirectionY;
-    cam.eyeZ -= moveSpeed * moveDirectionZ;
+    cam.eyeX += 2 * cos(cam.firstPersonState.azimuth);
+    cam.eyeZ -= 2 * sin(cam.firstPersonState.azimuth);
   }
   if (p.keyIsPressed && (p.keyCode == 65 || p.keyIsDown(p.LEFT_ARROW))) {
     cam.eyeX -= 2 * cos(cam.firstPersonState.azimuth + p.vPI / 2);
@@ -353,7 +343,7 @@ var sketch1 = function(p){
       p.pop();//
 
       p.image(p.vhs, 0-p.windowWidth/2, 0-p.windowHeight/2);
-      // console.log(p.cameraPosition);
+      console.log(p.cameraPosition);
 
   }
 
