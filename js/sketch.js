@@ -135,7 +135,7 @@ var sketch1 = function(p){
   a = function(){return 0.8 * Math.sin(time*0.1)};
   b = function(){return 0.04 * Math.sin(time*0.01)};
 
-  noise(()=> 0.1 + 1 + x() - y() * (Math.sin(time*0.01)+0.2),()=>Math.sin(time*0.05)*0.2+0.001).mult(solid(a,b,() => 0.2 + 0.5 * y()/1.5 / x()/1.5 * (Math.cos(time*0.015)+0.2))).modulate(noise(()=> 0.1*x()*x()*y()), 0.1).saturate(1.5).out()
+  noise(()=> 0.1 + 1 + x() - y() * (Math.sin(time*0.01)+0.2),()=>Math.sin(time*0.05)*0.2+0.001).mult(solid(a,b,() => 0.2 + 0.5 * y()/1.5 / x()/1.5 * (Math.cos(time*0.015)*0.3+0.02))).modulate(noise(()=> 0.1*x()*x()*y()), 0.1).saturate(1.5).out()
 
   // .saturate(1.5).contrast(2.5).out()
 
