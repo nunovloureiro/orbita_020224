@@ -11,7 +11,6 @@ var sketch1 = function(p){
     let sin = Math.sin;
     p.cameraPosition = [cam.eyeX, cam.eyeY, cam.eyeZ];
 
-
     cam.firstPersonState = cam.firstPersonState || {
     azimuth: -Math.atan2(cam.eyeZ - cam.centerZ, cam.eyeX - cam.centerX),
     zenith: -Math.atan2(cam.eyeY - cam.centerY, p.dist(cam.eyeX, cam.eyeZ, cam.centerX, cam.centerZ)),
@@ -38,7 +37,9 @@ var sketch1 = function(p){
   // Start a gradual transition
   cam.firstPersonState.transitioning = true;
   cam.firstPersonState.transitionStartTime = millis;
-  cam.firstPersonState.startAzimuth = cam.firstPersonState.azimuth;
+
+
+  cam.firstPersonState.startAzimuth = -Math.atan2(cam.eyeZ - cam.centerZ, cam.eyeX - cam.centerX);
 
   // Check if cam.eyeX, cam.eyeY or cam.eyeZ is larger than (p.windowWidth + 200)
   if (cam.eyeX > p.windowWidth + 200 || cam.eyeY > p.windowWidth + 200 || cam.eyeZ > p.windowWidth + 200) {
@@ -69,7 +70,8 @@ var sketch1 = function(p){
   }
 
   // Movement controls
-  let moveSpeed = 1;
+  let moveSpeed = 2;
+  let autoMoveSpeed = 0.5;
   let moveDirectionX = cos(cam.firstPersonState.azimuth); // X component of movement direction
   let moveDirectionZ = sin(cam.firstPersonState.azimuth); // Z component of movement direction
 
@@ -80,9 +82,13 @@ var sketch1 = function(p){
   // Calculate the Y component of movement direction
   let moveDirectionY = sin(cam.firstPersonState.zenith);
 
-
-  if (cam.eyeX > p.windowWidth * 2 || cam.eyeX < p.windowWidth * -2 || cam.eyeZ > p.windowWidth * 2 || cam.eyeZ < p.windowWidth * -2) {
-    moveSpeed = -1;
+  // if (cam.eyeX > p.windowWidth * 2 || cam.eyeX < p.windowWidth * -2 || cam.eyeZ > p.windowWidth * 2 || cam.eyeZ < p.windowWidth * -2) {
+  //   moveSpeed = -1;
+  // }
+  if (p.keyIsPressed === false) {
+    cam.eyeX += autoMoveSpeed * moveDirectionX;
+    cam.eyeY += autoMoveSpeed * moveDirectionY;
+    cam.eyeZ += autoMoveSpeed * moveDirectionZ;
   }
 
   if (p.keyIsPressed && (p.keyCode == 87 || p.keyIsDown(p.UP_ARROW))) {
@@ -96,13 +102,15 @@ var sketch1 = function(p){
     cam.eyeZ -= moveSpeed * moveDirectionZ;
   }
   if (p.keyIsPressed && (p.keyCode == 65 || p.keyIsDown(p.LEFT_ARROW))) {
-    cam.eyeX -= 2 * cos(cam.firstPersonState.azimuth + p.vPI / 2);
-    cam.eyeZ += 2 * sin(cam.firstPersonState.azimuth + p.vPI / 2);
+    cam.eyeX -= moveSpeed * cos(cam.firstPersonState.azimuth + p.vPI / 2);
+    cam.eyeZ += moveSpeed * sin(cam.firstPersonState.azimuth + p.vPI / 2);
   }
   if (p.keyIsPressed && (p.keyCode == 68 || p.keyIsDown(p.RIGHT_ARROW))) {
-    cam.eyeX += 2 * cos(cam.firstPersonState.azimuth + p.vPI / 2);
-    cam.eyeZ -= 2 * sin(cam.firstPersonState.azimuth + p.vPI / 2);
+    cam.eyeX += moveSpeed * cos(cam.firstPersonState.azimuth + p.vPI / 2);
+    cam.eyeZ -= moveSpeed * sin(cam.firstPersonState.azimuth + p.vPI / 2);
   }
+
+
 
   // Update previous mouse position
   cam.firstPersonState.mousePrevX = mouseX;
@@ -135,7 +143,9 @@ var sketch1 = function(p){
   a = function(){return 0.8 * Math.sin(time*0.1)};
   b = function(){return 0.04 * Math.sin(time*0.01)};
 
-  noise(()=> 0.1 + 1 + x() - y() * (Math.sin(time*0.01)+0.2),()=>Math.sin(time*0.05)*0.2+0.001).mult(solid(a,b,() => 0.2 + 0.5 * y()/1.5 / x()/1.5 * (Math.cos(time*0.015)*0.3+0.02))).modulate(noise(()=> 0.1*x()*x()*y()), 0.1).saturate(1.5).out()
+  noise(()=> 0.1 + 1 + x() - y() * (Math.sin(time*0.01)+0.2),()=>Math.sin(time*0.05)*0.1+0.001).mult(solid(a,b,() => 0.2 + 0.5 * y()/1.5 / x()/1.5 * (Math.cos(time*0.025)*3+0.02))).modulate(noise(()=> 0.1*x()*x()*y()), 0.1).saturate(1.5).out()
+
+  // noise(()=> 0.1 + 1 + x() - y() * (Math.sin(time*0.01)+0.2),()=>Math.sin(time*0.05)*0.2+0.001).mult(solid(a,b,() => 0.2 + 0.5 * y()/1.5 / x()/1.5 * (Math.cos(time*0.015)*0.3+0.02))).modulate(noise(()=> 0.1*x()*x()*y()), 0.1).saturate(1.5).out()
 
   // .saturate(1.5).contrast(2.5).out()
 
@@ -571,13 +581,13 @@ var sketch3 = function(p){
     p.textCanvas.textAlign(p.CENTER,p.CENTER);
     p.textCanvas.textStyle(p.NORMAL);
     p.textCanvas.textSize(p.int(p.Xaxis/70));
-    p.textCanvas.text("infinitely deformed and transformed cuts of lua onus. eyes with mouse/trackpad - w+a+s+d makes it move.\ncomputer use is recommended. mobile cpu is not good enough. select a pixel to make it sound. esc key to shut it up.", p.Xaxis/2, p.Yaxis/2.8);
+    p.textCanvas.text("infinitely deformed and transformed cuts of lua onus. eyes with mouse/trackpad - w+a+s+d makes it move.\ncomputer use is recommended. mobile cpu is not good enough. select a pixel to make it sound.", p.Xaxis/2, p.Yaxis/2.8);
     // p.Yaxis/3.3
     //INFO TEXT 2
     p.textCanvas.textAlign(p.CENTER,p.CENTER);
     p.textCanvas.textStyle(p.NORMAL);
     p.textCanvas.textSize(p.int(p.Xaxis/70));
-    p.textCanvas.text("piece created by nuno loureiro for gnration's órbita program [órbita #23]. huge thank you to the authors of the open\nsource tools that were necessary to its development (webpd: sébastien piquemal / hydra: olivia jack / pd / p5js) as well \nas the respective discord communities, daniel shiffman and gnration's luís fernandes and ilídio marques for the invite.", p.Xaxis/2, p.Yaxis/1.53);
+    p.textCanvas.text("piece created by nuno loureiro for gnration's órbita program [órbita #23]. huge thank you to the authors of the open\nsource tools that were necessary to its development (webpd: sébastien piquemal / hydra: olivia jack / pd / p5js) as well \nas the respective discord communities, daniel shiffman and gnration's luís fernandes and ilídio marques for the invite.\n\ncaution: fast and bright color movement.", p.Xaxis/2, p.Yaxis/1.53);
     // p.Yaxis/1.4
     // p.Xaxis/7.7
 
@@ -593,7 +603,7 @@ var sketch3 = function(p){
     p.textCanvas.textAlign(p.CENTER,p.CENTER);
     p.textCanvas.textStyle(p.NORMAL);
     p.textCanvas.textSize(p.int(p.Yaxis/70));
-    p.textCanvas.text("piece created by nuno loureiro for gnration's órbita\nprogram [órbita #23]. huge thank you to the authors of the\nopen source tools that were necessary to its development\n(webpd: sébastien piquemal / hydra: olivia jack / pd / p5js)\nas well as the respective discord communities, daniel shiffman\nand gnration's luís fernandes and ilídio marques for the invite.", p.Xaxis/2, p.Yaxis/1.53);
+    p.textCanvas.text("piece created by nuno loureiro for gnration's órbita\nprogram [órbita #23]. huge thank you to the authors of the\nopen source tools that were necessary to its development\n(webpd: sébastien piquemal / hydra: olivia jack / pd / p5js)\nas well as the respective discord communities, daniel shiffman\nand gnration's luís fernandes and ilídio marques for the invite.\n\ncaution: fast and bright color movement.", p.Xaxis/2, p.Yaxis/1.53);
     // p.Yaxis/1.4
     // p.Xaxis/7.7
 
