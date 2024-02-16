@@ -454,12 +454,6 @@ var sketch1 = function(p){
         }
       };
 
-  p.toImage = function(c) {
-      	p.loadImage(c.toDataURL("image/png"), (im) => {
-      		p.tex = im;
-      	})
-      }
-
   p.windowResized = function(){
           p.resizeCanvas(p.windowWidth, p.windowHeight);
     }
