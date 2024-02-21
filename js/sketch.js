@@ -3,15 +3,15 @@ var sketch1 = function(p){
 
   //CAMERA AND MOVEMENT SETUP
   window.firstPerson = (cam) => {
-    let millis = Date.now();
-    let mouseX = p.mouseX;
-    let mouseY = p.mouseY;
-    let abs = Math.abs;
-    let cos = Math.cos;
-    let sin = Math.sin;
-    p.cameraPosition = [cam.eyeX, cam.eyeY, cam.eyeZ];
+  let millis = Date.now();
+  let mouseX = p.mouseX;
+  let mouseY = p.mouseY;
+  let abs = Math.abs;
+  let cos = Math.cos;
+  let sin = Math.sin;
+  p.cameraPosition = [cam.eyeX, cam.eyeY, cam.eyeZ];
 
-    cam.firstPersonState = cam.firstPersonState || {
+  cam.firstPersonState = cam.firstPersonState || {
     azimuth: -Math.atan2(cam.eyeZ - cam.centerZ, cam.eyeX - cam.centerX),
     zenith: -Math.atan2(cam.eyeY - cam.centerY, p.dist(cam.eyeX, cam.eyeZ, cam.centerX, cam.centerZ)),
     lookAtDist: p.dist(cam.eyeX, cam.eyeY, cam.eyeZ, cam.centerX, cam.centerY, cam.centerZ),
@@ -22,110 +22,87 @@ var sketch1 = function(p){
     transitionDuration: 2000,
     transitionStartTime: 0,
     transitioning: false,
-    userInput: false, // Track user input
+    userInput: false,
   };
 
-  // Check for user input
-  if (p.keyIsPressed || mouseX !== cam.firstPersonState.mousePrevX || mouseY !== cam.firstPersonState.mousePrevY) {
-    cam.firstPersonState.userInput = true;
-  } else {
-    cam.firstPersonState.userInput = false;
+  let userInput = p.keyIsPressed || mouseX !== cam.firstPersonState.mousePrevX || mouseY !== cam.firstPersonState.mousePrevY;
+  cam.firstPersonState.userInput = userInput;
+
+  if (!userInput && millis - cam.firstPersonState.directionChangeTime > cam.firstPersonState.directionChangeInterval) {
+    cam.firstPersonState.transitioning = true;
+    cam.firstPersonState.transitionStartTime = millis;
+    cam.firstPersonState.startAzimuth = -Math.atan2(cam.eyeZ - cam.centerZ, cam.eyeX - cam.centerX);
+
+    if (Math.abs(cam.eyeX) > p.windowWidth || Math.abs(cam.centerX) > p.windowWidth ||
+        Math.abs(cam.eyeY) > p.windowWidth || Math.abs(cam.centerY) > p.windowWidth ||
+        Math.abs(cam.eyeZ) > p.windowWidth || Math.abs(cam.centerZ) > p.windowWidth) {
+      cam.firstPersonState.targetAzimuth = -Math.atan2(cam.eyeZ, cam.eyeX); // point towards (0, 0, 0)
+    } else {
+      cam.firstPersonState.targetAzimuth = Math.atan2(0 - cam.centerX, 0 - cam.eyeX);
+    }
+
+    cam.firstPersonState.directionChangeTime = millis;
   }
 
-  // Check if it's time to change direction and there's no user input
-  if (!cam.firstPersonState.userInput && millis - cam.firstPersonState.directionChangeTime > cam.firstPersonState.directionChangeInterval) {
-  // Start a gradual transition
-  cam.firstPersonState.transitioning = true;
-  cam.firstPersonState.transitionStartTime = millis;
-
-
-  cam.firstPersonState.startAzimuth = -Math.atan2(cam.eyeZ - cam.centerZ, cam.eyeX - cam.centerX);
-
-  // Check if cam.eyeX, cam.eyeY or cam.eyeZ is larger than (p.windowWidth + 200)
-  if (cam.eyeX > p.windowWidth + 200 || cam.eyeY > p.windowWidth + 200 || cam.eyeZ > p.windowWidth + 200) {
-    cam.firstPersonState.targetAzimuth = -Math.atan2(cam.eyeZ, cam.eyeX); // point towards (0, 0, 0)
-  } else {
-    cam.firstPersonState.targetAzimuth = Math.random() * p.vPI * 2;
-  }
-
-  cam.firstPersonState.directionChangeTime = millis; // Update the timestamp
-}
-
-  // Gradual transition for azimuth
   if (cam.firstPersonState.transitioning) {
     const elapsedTime = millis - cam.firstPersonState.transitionStartTime;
     const t = Math.min(elapsedTime / cam.firstPersonState.transitionDuration, 1);
     cam.firstPersonState.azimuth = p.lerp(cam.firstPersonState.startAzimuth, cam.firstPersonState.targetAzimuth, t);
-
-    // Check if the transition is complete
-    if (t === 1) {
-      cam.firstPersonState.transitioning = false;
-    }
+    if (t === 1) cam.firstPersonState.transitioning = false;
   }
 
-  // Look around controls
   cam.firstPersonState.azimuth -= (mouseX - cam.firstPersonState.mousePrevX) / 100;
-  if (abs(cam.firstPersonState.zenith + (mouseY - cam.firstPersonState.mousePrevY) / 100) < p.vPI / 2) {
-    cam.firstPersonState.zenith += (mouseY - cam.firstPersonState.mousePrevY) / 100;
-  }
+  if (abs(cam.firstPersonState.zenith + (mouseY - cam.firstPersonState.mousePrevY) / 100) < p.vPI / 2) cam.firstPersonState.zenith += (mouseY - cam.firstPersonState.mousePrevY) / 100;
 
-  // Movement controls
   let moveSpeed = 2;
   let autoMoveSpeed = 0.5;
-  let moveDirectionX = cos(cam.firstPersonState.azimuth); // X component of movement direction
-  let moveDirectionZ = sin(cam.firstPersonState.azimuth); // Z component of movement direction
-
-  // Adjust moveDirectionX and moveDirectionZ based on zenith angle
+  let moveDirectionX = cos(cam.firstPersonState.azimuth);
+  let moveDirectionZ = sin(cam.firstPersonState.azimuth);
   moveDirectionX *= cos(cam.firstPersonState.zenith);
   moveDirectionZ *= cos(cam.firstPersonState.zenith);
-
-  // Calculate the Y component of movement direction
   let moveDirectionY = sin(cam.firstPersonState.zenith);
 
-  // if (cam.eyeX > p.windowWidth * 2 || cam.eyeX < p.windowWidth * -2 || cam.eyeZ > p.windowWidth * 2 || cam.eyeZ < p.windowWidth * -2) {
-  //   moveSpeed = -1;
-  // }
-  if (p.keyIsPressed === false) {
+  if (!p.keyIsPressed) {
     cam.eyeX += autoMoveSpeed * moveDirectionX;
     cam.eyeY += autoMoveSpeed * moveDirectionY;
     cam.eyeZ += autoMoveSpeed * moveDirectionZ;
   }
 
-  if (p.keyIsPressed && (p.keyCode == 87 || p.keyIsDown(p.UP_ARROW))) {
-    cam.eyeX += moveSpeed * moveDirectionX;
-    cam.eyeY += moveSpeed * moveDirectionY;
-    cam.eyeZ += moveSpeed * moveDirectionZ;
-  }
-  if (p.keyIsPressed && (p.keyCode == 83 || p.keyIsDown(p.DOWN_ARROW))) {
-    cam.eyeX -= moveSpeed * moveDirectionX;
-    cam.eyeY -= moveSpeed * moveDirectionY;
-    cam.eyeZ -= moveSpeed * moveDirectionZ;
-  }
-  if (p.keyIsPressed && (p.keyCode == 65 || p.keyIsDown(p.LEFT_ARROW))) {
-    cam.eyeX -= moveSpeed * cos(cam.firstPersonState.azimuth + p.vPI / 2);
-    cam.eyeZ += moveSpeed * sin(cam.firstPersonState.azimuth + p.vPI / 2);
-  }
-  if (p.keyIsPressed && (p.keyCode == 68 || p.keyIsDown(p.RIGHT_ARROW))) {
-    cam.eyeX += moveSpeed * cos(cam.firstPersonState.azimuth + p.vPI / 2);
-    cam.eyeZ -= moveSpeed * sin(cam.firstPersonState.azimuth + p.vPI / 2);
-  }
+  const moveKey = (keyCode, x, y, z) => {
+    if (p.keyIsPressed && (p.keyCode == keyCode || p.keyIsDown(p[keyCode]))) {
+      cam.eyeX += moveSpeed * x;
+      cam.eyeY += moveSpeed * y;
+      cam.eyeZ += moveSpeed * z;
+    }
+  };
 
+  moveKey(87, moveDirectionX, moveDirectionY, moveDirectionZ);
+  moveKey(83, -moveDirectionX, -moveDirectionY, -moveDirectionZ);
+  moveKey(65, -cos(cam.firstPersonState.azimuth + p.vPI / 2), 0, sin(cam.firstPersonState.azimuth + p.vPI / 2));
+  moveKey(68, cos(cam.firstPersonState.azimuth + p.vPI / 2), 0, -sin(cam.firstPersonState.azimuth + p.vPI / 2));
 
+  // Restrict cam.eyeX and cam.centerX values within -p.windowWidth and p.windowWidth
+  cam.eyeX = Math.max(-p.windowWidth, Math.min(p.windowWidth, cam.eyeX));
+  cam.centerX = Math.max(-p.windowWidth, Math.min(p.windowWidth, cam.centerX));
 
-  // Update previous mouse position
+  // Restrict cam.eyeY and cam.centerY values within -p.windowWidth and p.windowWidth
+  cam.eyeY = Math.max(-p.windowWidth, Math.min(p.windowWidth, cam.eyeY));
+  cam.centerY = Math.max(-p.windowWidth, Math.min(p.windowWidth, cam.centerY));
+
+  // Restrict cam.eyeZ and cam.centerZ values within -p.windowWidth and p.windowWidth
+  cam.eyeZ = Math.max(-p.windowWidth, Math.min(p.windowWidth, cam.eyeZ));
+  cam.centerZ = Math.max(-p.windowWidth, Math.min(p.windowWidth, cam.centerZ));
+
   cam.firstPersonState.mousePrevX = mouseX;
   cam.firstPersonState.mousePrevY = mouseY;
 
-  // Update the look-at point
   cam.centerX = cam.eyeX - cam.firstPersonState.lookAtDist * cos(cam.firstPersonState.zenith) * cos(cam.firstPersonState.azimuth);
   cam.centerY = cam.eyeY + cam.firstPersonState.lookAtDist * sin(cam.firstPersonState.zenith);
   cam.centerZ = cam.eyeZ + cam.firstPersonState.lookAtDist * cos(cam.firstPersonState.zenith) * sin(cam.firstPersonState.azimuth);
 
-  // Call the built-in p5 function 'camera' to position and orient the camera
-  p.camera(cam.eyeX, cam.eyeY, cam.eyeZ,  // position
-    cam.centerX, cam.centerY, cam.centerZ,  // look-at
-    0, 1, 0);  // up vector
-  };
+  p.camera(cam.eyeX, cam.eyeY, cam.eyeZ, cam.centerX, cam.centerY, cam.centerZ, 0, 1, 0);
+};
+
 
 
   ///HYDRA BACKGROUND CANVAS
@@ -195,7 +172,8 @@ var sketch1 = function(p){
   p.preload = function() {
     // p.lua = p.loadModel('./assets/moon.obj');
     p.edificio = p.loadModel('./assets/Edificios.obj');
-    p.font = p.loadFont('./assets/SpaceGrotesk.ttf');
+    // p.font = p.loadFont('./assets/SpaceGrotesk.ttf');
+    p.font = p.loadFont('./assets/OpenSans-ExtraBold.ttf');
     p.names = p.loadStrings('./assets/recipes.txt');
   }
 
@@ -338,6 +316,8 @@ var sketch1 = function(p){
       p.scale(p.scaler);
       p.drawScene();
 
+      console.log("cam.eyeX: ", p.cam.eyeX, "cam.eyeY: ", p.cam.eyeY, "cam.eyeZ: ", p.cam.eyeZ, "cam.centerX: ", p.cam.centerX, "cam.centerY: ", p.cam.centerY, "cam.centerZ: ", p.cam.centerZ);
+
       //temepo aleatório para apagar palavra antiga. verificar que funciona?
       let gate = p.int(Math.random()*50);
       // console.log(gate);
@@ -454,7 +434,7 @@ var sketch1 = function(p){
         }
       };
 
-  p.windowResized = function(){
+  p.windowResized = function() {
           p.resizeCanvas(p.windowWidth, p.windowHeight);
     }
 }
@@ -575,7 +555,7 @@ var sketch3 = function(p){
     p.textCanvas.textAlign(p.CENTER,p.CENTER);
     p.textCanvas.textStyle(p.NORMAL);
     p.textCanvas.textSize(p.int(p.Xaxis/70));
-    p.textCanvas.text("infinitely deformed and transformed cuts of lua onus. eyes with mouse/trackpad - w+a+s+d makes it move.\ncomputer use is recommended. mobile cpu is not good enough. select a pixel to make it sound.", p.Xaxis/2, p.Yaxis/2.8);
+    p.textCanvas.text("infinitely deformed and transformed cuts of lua onus. eyes with mouse/trackpad - w+a+s+d makes it move.\ncomputer use is recommended. select a pixel to make it sound.", p.Xaxis/2, p.Yaxis/2.8);
     // p.Yaxis/3.3
     //INFO TEXT 2
     p.textCanvas.textAlign(p.CENTER,p.CENTER);
@@ -591,7 +571,7 @@ var sketch3 = function(p){
     p.textCanvas.textAlign(p.CENTER,p.CENTER);
     p.textCanvas.textStyle(p.NORMAL);
     p.textCanvas.textSize(p.int(p.Yaxis/70));
-    p.textCanvas.text("infinitely deformed and transformed cuts of lua onus.\neyes with mouse/trackpad - w+a+s+d makes it move.\ncomputer use is recommended. mobile cpu is not\ngood enough. select a pixel to make it sound.", p.Xaxis/2, p.Yaxis/2.8);
+    p.textCanvas.text("infinitely deformed and transformed cuts of lua onus.\neyes with mouse/trackpad - w+a+s+d makes it move.\ncomputer use is recommended. select a pixel to make it sound.", p.Xaxis/2, p.Yaxis/2.8);
     // p.Yaxis/3.3
     //INFO TEXT 2
     p.textCanvas.textAlign(p.CENTER,p.CENTER);
