@@ -561,7 +561,7 @@ var sketch3 = function(p){
     p.textCanvas.textAlign(p.CENTER,p.CENTER);
     p.textCanvas.textStyle(p.NORMAL);
     p.textCanvas.textSize(p.int(p.Xaxis/70));
-    p.textCanvas.text("nuno loureiro for gnration [órbita #23].\n thank you to the authors of the open-source tools used (webpd: sébastien piquemal / hydra: olivia jack / pd / p5js),\n as well as the respective discord communities, daniel shiffman and gnration for the invite.\n\ncaution: fast and bright color movement.", p.Xaxis/2, p.Yaxis/1.5);
+    p.textCanvas.text("nuno loureiro for gnration [órbita #24].\n thank you to the authors of the open-source tools used (webpd: sébastien piquemal / hydra: olivia jack / pd / p5js),\n as well as the respective discord communities, daniel shiffman and gnration for the invite.\n\ncaution: fast and bright color movement.", p.Xaxis/2, p.Yaxis/1.5);
     // p.Yaxis/1.4
     // p.Xaxis/7.7
 
@@ -577,7 +577,7 @@ var sketch3 = function(p){
     p.textCanvas.textAlign(p.CENTER,p.CENTER);
     p.textCanvas.textStyle(p.NORMAL);
     p.textCanvas.textSize(p.int(p.Yaxis/70));
-    p.textCanvas.text("nuno loureiro for gnration [órbita #23].\nthank you to the authors of the open-source\ntools used (webpd: sébastien piquemal /\nhydra: olivia jack / pd / p5js) as well as the\nrespective discord communities, daniel\nshiffman and gnration for the invite.\n\ncaution: fast and bright color movement.", p.Xaxis/2, p.Yaxis/1.53);
+    p.textCanvas.text("nuno loureiro for gnration [órbita #24].\nthank you to the authors of the open-source\ntools used (webpd: sébastien piquemal /\nhydra: olivia jack / pd / p5js) as well as the\nrespective discord communities, daniel\nshiffman and gnration for the invite.\n\ncaution: fast and bright color movement.", p.Xaxis/2, p.Yaxis/1.53);
     // p.Yaxis/1.4
     // p.Xaxis/7.7
 
